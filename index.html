@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Agenda da Sabrina</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fff4f8; --card:#ffffff; --ink:#2b1630; --muted:#9a7f97;
+    --line:#f6e3ee; --accent:#ff2e7e; --accent-soft:#ffe0ee;
+    --grad:linear-gradient(135deg,#ff2e7e 0%,#ff5f6d 45%,#ffb347 100%);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:Nunito,system-ui,sans-serif;background:
+    radial-gradient(circle at 10% 0%,#ffd6e8 0,transparent 40%),
+    radial-gradient(circle at 100% 30%,#ffe7c7 0,transparent 35%),var(--bg);
+    color:var(--ink);min-height:100vh}
+  .wrap{max-width:560px;margin:0 auto;padding:16px 16px 110px}
+  .hero{position:relative;overflow:hidden;background:var(--grad);color:#fff;border-radius:28px;padding:22px 20px 20px;margin-bottom:18px;box-shadow:0 14px 30px -10px rgba(255,46,126,.55)}
+  .hero::before,.hero::after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.15)}
+  .hero::before{width:180px;height:180px;right:-50px;top:-60px}
+  .hero::after{width:110px;height:110px;right:60px;bottom:-60px}
+  .hello{font-size:15px;font-weight:700;opacity:.95;position:relative}
+  h1{font-size:34px;font-weight:800;margin:2px 0 0;letter-spacing:-.5px;position:relative;line-height:1.05}
+  h1 span{display:inline-block;animation:beat 1.6s ease-in-out infinite}
+  @keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.25)}30%{transform:scale(1)}}
+  .date{font-size:14px;margin-top:6px;text-transform:capitalize;opacity:.9;position:relative}
+  .hero-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;position:relative}
+  .count{background:rgba(255,255,255,.25);backdrop-filter:blur(6px);color:#fff;border-radius:999px;padding:7px 14px;font-weight:800;font-size:14px;white-space:nowrap}
+  .progress{flex:1;height:10px;background:rgba(255,255,255,.3);border-radius:99px;overflow:hidden}
+  .progress>div{height:100%;background:#fff;width:0;transition:width .4s cubic-bezier(.3,1.4,.6,1)}
+  .phrase{margin-top:12px;font-size:14px;font-weight:600;opacity:.95;position:relative}
+  .confetti{position:fixed;top:-20px;font-size:22px;pointer-events:none;z-index:20;animation:fall 2.2s linear forwards}
+  @keyframes fall{to{transform:translateY(110vh) rotate(540deg);opacity:.6}}
+  .task{animation:pop .25s ease-out}
+  @keyframes pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 12px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;border:2px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;font-size:14px;color:var(--ink);display:flex;align-items:center;gap:6px;cursor:pointer}
+  .chip .dot{width:10px;height:10px;border-radius:50%}
+  .chip.on{border-color:var(--ink);background:var(--ink);color:#fff}
+  .chip.add{border-style:dashed;color:var(--muted)}
+
+  .add-task{display:flex;gap:8px;background:var(--card);border-radius:18px;padding:8px;box-shadow:0 2px 10px rgba(80,40,70,.06);margin-bottom:16px}
+  .add-task input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:16px;padding:10px 8px;background:transparent;color:var(--ink)}
+  .add-task select{border:0;background:var(--accent-soft);border-radius:12px;font:inherit;font-size:14px;font-weight:700;padding:0 8px;color:var(--ink);max-width:120px}
+  .chip.on{border-color:transparent;background:var(--grad);color:#fff;box-shadow:0 6px 14px -6px rgba(255,46,126,.6)}
+  .btn{border:0;background:var(--grad);color:#fff;font:inherit;font-weight:800;border-radius:12px;padding:0 16px;font-size:20px;cursor:pointer}
+
+  .group{margin-bottom:18px}
+  .group h2{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:0 4px 8px;display:flex;align-items:center;gap:8px}
+  .group h2 .dot{width:10px;height:10px;border-radius:50%}
+  .task{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:16px;padding:14px;margin-bottom:8px;box-shadow:0 1px 6px rgba(80,40,70,.05);border-left:5px solid var(--c,#ccc)}
+  .check{flex:none;width:26px;height:26px;border-radius:50%;border:2.5px solid var(--c,#ccc);background:transparent;display:grid;place-items:center;cursor:pointer;padding:0}
+  .task.done .check{background:var(--c)}
+  .check svg{opacity:0}
+  .task.done .check svg{opacity:1}
+  .task .txt{flex:1;font-size:16px;word-break:break-word}
+  .task.done .txt{text-decoration:line-through;color:var(--muted)}
+  .del{flex:none;border:0;background:transparent;color:#c9bcc8;font-size:20px;cursor:pointer;padding:4px 6px}
+  .empty{text-align:center;color:var(--muted);padding:40px 10px;font-size:15px}
+  .empty b{display:block;font-size:34px;margin-bottom:6px}
+  .clear{display:block;margin:6px auto 0;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+
+  /* modal */
+  .modal{position:fixed;inset:0;background:rgba(43,34,48,.45);display:none;align-items:flex-end;justify-content:center;z-index:10}
+  .modal.open{display:flex}
+  .sheet{background:var(--card);width:100%;max-width:560px;border-radius:24px 24px 0 0;padding:22px 18px 28px}
+  .sheet h3{margin:0 0 14px;font-size:20px}
+  .sheet input{width:100%;border:2px solid var(--line);border-radius:14px;padding:12px;font:inherit;font-size:16px;outline:0}
+  .sheet input:focus{border-color:var(--ink)}
+  .colors{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 18px}
+  .colors button{width:36px;height:36px;border-radius:50%;border:3px solid transparent;cursor:pointer}
+  .colors button.sel{border-color:var(--ink)}
+  .row{display:flex;gap:10px}
+  .row button{flex:1;padding:14px;border-radius:14px;font:inherit;font-weight:800;font-size:16px;border:0;cursor:pointer}
+  .ghost{background:var(--line);color:var(--ink)}
+  .danger{background:#fbe3e3;color:#b3261e}
+  .cat-list{margin:0 0 16px;padding:0;list-style:none}
+  .cat-list li{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);font-weight:700}
+  .cat-list li .dot{width:14px;height:14px;border-radius:50%}
+  .cat-list li span.n{flex:1}
+  .cat-list li button{border:0;background:transparent;color:#b3261e;font:inherit;font-weight:700;cursor:pointer}
+  .hint{color:var(--muted);font-size:13px;margin:-6px 0 12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="hello" id="hello">Oi,</div>
+    <h1>Sabrina <span>💖</span></h1>
+    <div class="date" id="today"></div>
+    <div class="hero-row">
+      <div class="progress"><div id="bar"></div></div>
+      <div class="count" id="count">0 pendentes</div>
+    </div>
+    <div class="phrase" id="phrase"></div>
+  </div>
+
+  <div class="chips" id="chips"></div>
+
+  <form class="add-task" id="addForm">
+    <input id="taskInput" placeholder="Nova tarefa..." autocomplete="off" maxlength="140">
+    <select id="catSelect" aria-label="Categoria"></select>
+    <button class="btn" type="submit" aria-label="Adicionar">+</button>
+  </form>
+
+  <div id="list"></div>
+</div>
+
+<!-- Nova categoria -->
+<div class="modal" id="catModal">
+  <div class="sheet">
+    <h3>Nova categoria</h3>
+    <input id="catName" placeholder="Ex.: Faculdade, Casa, Academia..." maxlength="24">
+    <div class="colors" id="colors"></div>
+    <div class="row">
+      <button class="ghost" id="catCancel">Cancelar</button>
+      <button class="btn" id="catSave" style="font-size:16px">Criar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Gerenciar categorias -->
+<div class="modal" id="manageModal">
+  <div class="sheet">
+    <h3>Categorias</h3>
+    <p class="hint">Apagar uma categoria apaga as tarefas dela também.</p>
+    <ul class="cat-list" id="catList"></ul>
+    <div class="row">
+      <button class="ghost" id="manageClose">Fechar</button>
+      <button class="btn" id="manageNew" style="font-size:16px">+ Nova</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmação -->
+<div class="modal" id="confirmModal">
+  <div class="sheet">
+    <h3 id="confirmText">Tem certeza?</h3>
+    <div class="row">
+      <button class="ghost" id="confirmNo">Cancelar</button>
+      <button class="danger" id="confirmYes">Apagar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PALETTE = ["#d9466f","#f08a24","#e6b800","#3aa76d","#2d8cd6","#7b5cd6","#c04fb8","#6b7a8a"];
+const KEY = "agenda-dados-v1";
+
+let state = load();
+let filter = "all";
+let newColor = PALETTE[0];
+
+function defaults(){
+  return {
+    cats:[
+      {id:"c1",name:"Casa",color:"#3aa76d"},
+      {id:"c2",name:"Trabalho",color:"#2d8cd6"},
+      {id:"c3",name:"Pessoal",color:"#d9466f"}
+    ],
+    tasks:[]
+  };
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){ const d = JSON.parse(raw); if(d && d.cats && d.tasks) return d; }
+  }catch(e){}
+  return defaults();
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+const uid = () => Math.random().toString(36).slice(2,9);
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const catById = id => state.cats.find(c => c.id === id);
+
+function render(){
+  // data
+  const d = new Date();
+  const hr = d.getHours();
+  $("hello").textContent = hr < 12 ? "Bom dia ☀️" : hr < 18 ? "Boa tarde 🌤️" : "Boa noite 🌙";
+  $("today").textContent = d.toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"});
+
+  // contador
+  const pend = state.tasks.filter(t => !t.done).length;
+  const total = state.tasks.length;
+  $("count").textContent = pend === 0 && total > 0 ? "Tudo feito! 🎉" : `${pend} pendente${pend===1?"":"s"}`;
+  $("bar").style.width = total ? ((total-pend)/total*100)+"%" : "0";
+  $("phrase").textContent =
+    !total ? "Bora organizar esse dia, linda? ✨" :
+    pend === 0 ? "Arrasou! Hoje você é uma porra mesmo 😂💅" :
+    (total-pend)/total >= .5 ? "Mais da metade feita, tá voando! 🚀" :
+    "Uma de cada vez, você consegue 💪";
+
+  // chips
+  if(filter !== "all" && !catById(filter)) filter = "all";
+  let h = `<button class="chip ${filter==="all"?"on":""}" data-f="all">Todas</button>`;
+  state.cats.forEach(c => {
+    const n = state.tasks.filter(t => t.cat===c.id && !t.done).length;
+    h += `<button class="chip ${filter===c.id?"on":""}" data-f="${c.id}"><span class="dot" style="background:${c.color}"></span>${esc(c.name)}${n?` · ${n}`:""}</button>`;
+  });
+  h += `<button class="chip add" data-f="manage">⚙︎ Categorias</button>`;
+  $("chips").innerHTML = h;
+
+  // select
+  const sel = $("catSelect");
+  const prev = sel.value;
+  sel.innerHTML = state.cats.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join("");
+  if(filter !== "all") sel.value = filter;
+  else if(prev && catById(prev)) sel.value = prev;
+
+  // lista
+  const cats = filter === "all" ? state.cats : state.cats.filter(c => c.id === filter);
+  let out = "";
+  cats.forEach(c => {
+    const ts = state.tasks.filter(t => t.cat === c.id).sort((a,b) => a.done - b.done);
+    if(!ts.length) return;
+    out += `<div class="group"><h2><span class="dot" style="background:${c.color}"></span>${esc(c.name)}</h2>`;
+    ts.forEach(t => {
+      out += `<div class="task ${t.done?"done":""}" style="--c:${c.color}">
+        <button class="check" data-t="${t.id}" aria-label="Concluir"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+        <span class="txt">${esc(t.text)}</span>
+        <button class="del" data-d="${t.id}" aria-label="Apagar">✕</button>
+      </div>`;
+    });
+    out += `</div>`;
+  });
+  if(!state.cats.length){
+    out = `<div class="empty"><b>🗂️</b>Crie uma categoria para começar.</div>`;
+  } else if(!out){
+    out = `<div class="empty"><b>✨</b>Nenhuma tarefa por aqui.<br>Adicione uma aí em cima!</div>`;
+  }
+  if(state.tasks.some(t => t.done)) out += `<button class="clear" id="clearDone">Limpar tarefas concluídas</button>`;
+  $("list").innerHTML = out;
+}
+
+// adicionar tarefa
+$("addForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const text = $("taskInput").value.trim();
+  const cat = $("catSelect").value;
+  if(!text) return;
+  if(!cat){ openCatModal(); return; }
+  state.tasks.push({id:uid(), text, cat, done:false});
+  $("taskInput").value = "";
+  save(); render();
+});
+
+// cliques
+$("chips").addEventListener("click", e => {
+  const b = e.target.closest("[data-f]"); if(!b) return;
+  if(b.dataset.f === "manage"){ openManage(); return; }
+  filter = b.dataset.f; render();
+});
+$("list").addEventListener("click", e => {
+  const c = e.target.closest("[data-t]");
+  if(c){
+    const t = state.tasks.find(x => x.id === c.dataset.t); t.done = !t.done; save(); render();
+    if(t.done) burst(state.tasks.every(x => x.done) ? 28 : 6);
+    return;
+  }
+  const d = e.target.closest("[data-d]");
+  if(d){ state.tasks = state.tasks.filter(x => x.id !== d.dataset.d); save(); render(); return; }
+  if(e.target.id === "clearDone"){
+    askConfirm("Limpar todas as tarefas concluídas?", () => { state.tasks = state.tasks.filter(t => !t.done); save(); render(); });
+  }
+});
+
+// modal nova categoria
+function openCatModal(){
+  $("manageModal").classList.remove("open");
+  $("catName").value = "";
+  newColor = PALETTE[state.cats.length % PALETTE.length];
+  renderColors();
+  $("catModal").classList.add("open");
+  setTimeout(() => $("catName").focus(), 50);
+}
+function renderColors(){
+  $("colors").innerHTML = PALETTE.map(c => `<button style="background:${c}" class="${c===newColor?"sel":""}" data-c="${c}" aria-label="Cor"></button>`).join("");
+}
+$("colors").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if(b){ newColor = b.dataset.c; renderColors(); } });
+$("catCancel").onclick = () => $("catModal").classList.remove("open");
+$("catSave").onclick = () => {
+  const name = $("catName").value.trim(); if(!name) return;
+  const c = {id:uid(), name, color:newColor};
+  state.cats.push(c); filter = c.id;
+  $("catModal").classList.remove("open");
+  save(); render();
+};
+$("catName").addEventListener("keydown", e => { if(e.key === "Enter") $("catSave").click(); });
+
+// gerenciar categorias
+function openManage(){
+  $("catList").innerHTML = state.cats.map(c => `<li><span class="dot" style="background:${c.color}"></span><span class="n">${esc(c.name)}</span><button data-rm="${c.id}">Apagar</button></li>`).join("") || `<li><span class="n" style="color:var(--muted);font-weight:600">Nenhuma categoria ainda.</span></li>`;
+  $("manageModal").classList.add("open");
+}
+$("catList").addEventListener("click", e => {
+  const b = e.target.closest("[data-rm]"); if(!b) return;
+  const c = catById(b.dataset.rm);
+  askConfirm(`Apagar "${c.name}" e as tarefas dela?`, () => {
+    state.cats = state.cats.filter(x => x.id !== c.id);
+    state.tasks = state.tasks.filter(t => t.cat !== c.id);
+    save(); render(); openManage();
+  });
+});
+$("manageClose").onclick = () => $("manageModal").classList.remove("open");
+$("manageNew").onclick = openCatModal;
+
+// confirmação
+let onYes = null;
+function askConfirm(text, fn){ $("confirmText").textContent = text; onYes = fn; $("confirmModal").classList.add("open"); }
+$("confirmNo").onclick = () => $("confirmModal").classList.remove("open");
+$("confirmYes").onclick = () => { $("confirmModal").classList.remove("open"); if(onYes) onYes(); };
+
+// fechar modal tocando fora
+document.querySelectorAll(".modal").forEach(m => m.addEventListener("click", e => { if(e.target === m) m.classList.remove("open"); }));
+
+function burst(n){
+  const em = ["💖","✨","🎉","💅","🌸","⭐"];
+  for(let i=0;i<n;i++){
+    const s = document.createElement("span");
+    s.className = "confetti";
+    s.textContent = em[Math.floor(Math.random()*em.length)];
+    s.style.left = Math.random()*100 + "vw";
+    s.style.animationDelay = Math.random()*0.5 + "s";
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 3000);
+  }
+}
+
+render();
+</script>
+</body>
+</html>
